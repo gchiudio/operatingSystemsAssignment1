@@ -7,7 +7,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "shm-01.h"
+#include <time.h>
 int main(){
+	srand(time(NULL));
+	int r=rand();
 	key_t ShmKEY;
 	int ShmID;
 	struct Memory *ShmPTR;
@@ -24,25 +27,26 @@ int main(){
 		exit(1);
 	}
 	printf("Producer has attatched the shared memory...\n");
-	int random=rand()%10;//sets random to value between 0 and 9
 	int loop=10;
 	printf("Producer prepared to make %d items.\n", (loop*2));
 	int index=0;//producer makes 2 items per loop
 	ShmPTR -> status = TAKEN;//sets initial status to taken (empty)
+	sleep(1);
 	for(int i=0; i<loop; i++){
 		while(ShmPTR->status != TAKEN)//waits if buffer is full
 			;
-		random=rand()%10;//generates "item"
-		
-		ShmPTR->data[index]=random;//stores item in buff
-		printf("Stored two items: %d ", random);
-		random=rand()%10;
+		r = rand()%50;//generates "item"
+		ShmPTR->data[0]=0;
+		ShmPTR->data[index]=r;//stores item in buff
+		printf("\t\t\t\t\t\tStored two items: %d ", ShmPTR->data[index]);
+		r = rand()%50;
 		index++;
-		ShmPTR->data[index] = random;//stores item in buff
-		printf("and %d.\n", random);
+		ShmPTR->data[1]=0;
+		ShmPTR->data[index] = r;//stores item in buff
+		printf("and %d.\n", ShmPTR->data[index]);
 		index=0;
 		ShmPTR->status = FILLED;//flags consumer that buffer is full
-		printf("Producer sent filled status to consumer.\n");
+		printf("Producer sent FILLED status to consumer.\n");
 	}
 	shmdt((void *) ShmPTR);//detatches shared memory
 	shmctl(ShmID, IPC_RMID, NULL);//removes shared memory id

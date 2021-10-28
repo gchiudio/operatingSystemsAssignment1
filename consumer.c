@@ -11,6 +11,7 @@
 
 int main()
 {
+	sleep(1);
 	key_t ShmKEY;
 	int ShmID;
 	struct Memory *ShmPTR;
@@ -38,9 +39,10 @@ int main()
 		item[index] = ShmPTR->data[index];
 		index++;
 		item[index] = ShmPTR->data[index];//data taken from shared mem
-		printf("Received data: %d and %d.\n", item[0], item[1]);//prints received data
+		printf("\t\t\t\t\t\tReceived data: %d and %d.\n", item[0], item[1]);//prints received data
 		index=0;
 		ShmPTR->status = TAKEN;//flags producer buffer is empty
+		printf("Consumer sent TAKEN status to producer.\n");
 	}
 	shmdt((void *) ShmPTR);//detatches shared memory
 	printf("Consumer cleaned up.\n");
